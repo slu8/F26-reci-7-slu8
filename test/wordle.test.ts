@@ -13,11 +13,55 @@ import { matchGuess } from '../src/wordle';
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 // Step 1: a generator for five-letter uppercase words.
-// const word = ...
+const wordFrom = (letters: string) =>
+  fc.array(fc.constantFrom(...letters), {minLength: 5, maxLength: 5}).map(cs => cs.join(''));
+const word = wordFrom(ALPHABET);
+// Step 4: comment out above and switch to tiny alphabet to kill singlepass mutant; uncomment below line
+//const word = wordFrom('ABC');
+
 
 describe('matchGuess', () => {
-  it.todo('returns exactly five colors');
-  it.todo('only uses the colors G, Y, B');
-  it.todo('guessing the secret gives all greens');
-  it.todo('never credits a letter more times than the secret contains it');
+  // Step 2: two invariants
+  // it.todo('returns exactly five colors');
+  it('returns exavtly five colors', () => {
+    fc.assert(
+      fc.property(word, word, (secret, guess) => {
+        expect (matchGuess(secret, guess)).toHaveLength(5);
+      }),
+    );
+  });
+
+  // it.todo('only uses the colors G, Y, B');
+  it('only uses the color G, Y, B', () => {
+    fc.assert(
+      fc.property(word, word, (secret, guess) => {
+        for (const c of matchGuess(secret, guess)) expect(['G', 'Y', 'B']).toContain(c);
+      }),
+    );
+  });
+
+  // Step 3: a conditional property
+  // it.todo('guessing the secret gives all greens');
+  it('guessing the secret gives all greens', () => {
+    fc.assert(
+      fc.property(word, w => {
+        expect(matchGuess(w,w)).toEqual(['G', 'G', 'G', 'G', 'G']);
+      }),
+    );
+  });
+
+  // Step 4: duplicate letter invariants
+  // it.todo('never credits a letter more times than the secret contains it');
+  it('never credits a letter more times than the secret contains it', () => {
+    fc.assert(
+      fc.property(word, word, (secret, guess) => {
+        const result = matchGuess(secret, guess);
+        for (const letter of new Set(guess)) {
+          const credited = [...guess].filter((c, i) => c === letter && result[i] !== 'B').length;
+          const inSecret = [...secret].filter(c => c === letter).length;
+          expect(credited).toBeLessThanOrEqual(inSecret);
+        }
+      }),
+    );
+  });
 });
