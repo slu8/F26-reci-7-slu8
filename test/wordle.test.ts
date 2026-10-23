@@ -15,9 +15,9 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 // Step 1: a generator for five-letter uppercase words.
 const wordFrom = (letters: string) =>
   fc.array(fc.constantFrom(...letters), {minLength: 5, maxLength: 5}).map(cs => cs.join(''));
-const word = wordFrom(ALPHABET);
+//const word = wordFrom(ALPHABET);
 // Step 4: comment out above and switch to tiny alphabet to kill singlepass mutant; uncomment below line
-//const word = wordFrom('ABC');
+const word = wordFrom('ABC');
 
 
 describe('matchGuess', () => {
@@ -48,6 +48,15 @@ describe('matchGuess', () => {
         expect(matchGuess(w,w)).toEqual(['G', 'G', 'G', 'G', 'G']);
       }),
     );
+  });
+
+  it('if letter is present but in wrong position, should be yellow', () => {
+    const secret = 'ABCDE';
+    const guess = 'XACDE';
+  
+    expect(matchGuess(secret, guess)).toEqual([
+      'B', 'Y', 'G', 'G', 'G',
+    ]);
   });
 
   // Step 4: duplicate letter invariants
