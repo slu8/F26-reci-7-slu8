@@ -23,7 +23,7 @@ const word = wordFrom(ALPHABET);
 describe('matchGuess', () => {
   // Step 2: two invariants
   // it.todo('returns exactly five colors');
-  it('returns exavtly five colors', () => {
+  it('returns exactly five colors', () => {
     fc.assert(
       fc.property(word, word, (secret, guess) => {
         expect (matchGuess(secret, guess)).toHaveLength(5);
